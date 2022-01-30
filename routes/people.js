@@ -23,6 +23,7 @@ router.get('/', async (req, res, next) => {
     //   - por exemplo, assim que uma pessoa é excluída, uma mensagem de
     //     sucesso pode ser mostrada
     // - error: idem para mensagem de erro
+
     res.render('list-people', {
       people,
       success: req.flash('success'),
@@ -104,7 +105,7 @@ router.post('/', async (req, res) => {
     );
 
     await transaction.commit();
-    req.flash('success', 'Pessoa criada com sucesso!');
+    req.flash('success', `Pessoa com nome ${name} criada com sucesso!`);
   } catch (e) {
     try {
       if (transaction) {
@@ -113,7 +114,7 @@ router.post('/', async (req, res) => {
     } catch (err) {}
 
     console.error(e);
-    e.friendlyMessage = 'Erro: Não foi possível criar a nova pessoa.';
+    e.friendlyMessage = `Erro: Não foi possível criar a nova pessoa com nome ${name}.`;
   } finally {
     await transaction.release();
     res.redirect('/people');
@@ -132,12 +133,16 @@ router.delete('/:id', async (req, res) => {
 
   try {
     await db.execute(`DELETE FROM person WHERE id=?;`, [id]);
-    req.flash('success', 'Pessoa excluída com sucesso!');
-    res.redirect('/people');
+    req.flash(
+      'success',
+      `Pessoa excluída com id = ${id} excluída com sucesso!`
+    );
   } catch (e) {
     console.error(e);
     e.friendlyMessage = 'Não foi possível excluir a pessoa.';
     req.flash('error', 'Não foi posível excluir a pessoa.');
+  } finally {
+    res.redirect('/people');
   }
 });
 
