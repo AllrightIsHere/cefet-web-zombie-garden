@@ -24,10 +24,14 @@ router.get('/', async (req, res, next) => {
     //     sucesso pode ser mostrada
     // - error: idem para mensagem de erro
 
-    res.render('list-people', {
-      people,
-      success: req.flash('success'),
-      error: req.flash('error'),
+    res.format({
+      html: () =>
+        res.render('list-people', {
+          people,
+          success: req.flash('success'),
+          error: req.flash('error'),
+        }),
+      json: () => res.json({ people }),
     });
   } catch (error) {
     console.error(error);
@@ -139,8 +143,8 @@ router.delete('/:id', async (req, res) => {
     );
   } catch (e) {
     console.error(e);
-    e.friendlyMessage = 'Não foi possível excluir a pessoa.';
-    req.flash('error', 'Não foi posível excluir a pessoa.');
+    e.friendlyMessage = `Não foi possível excluir a pessoa com id = ${id}.`;
+    req.flash('error', `Não foi posível excluir a pessoa com id = ${id}.`);
   } finally {
     res.redirect('/people');
   }
